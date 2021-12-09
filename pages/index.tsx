@@ -22,27 +22,30 @@ const Home: NextPage = () => {
 
   const handleAddTodo = () => {
     if (!todoInputValue) return;
-    setTodoList([...todoList, todoInputValue]);
+    setTodoList((state) => [...state, todoInputValue]);
     setTodoInputValue("");
   };
 
-  const handleDeleteTodo = (deleteValue: string) => {
-    const updatedTodoList = todoList.filter((todo) => todo !== deleteValue);
+  const handleDeleteTodo = (deleteIndex: number) => {
+    const updatedTodoList = todoList.filter(
+      (todo, index) => index !== deleteIndex
+    );
     setTodoList(updatedTodoList);
   };
 
   const handleEditTodo = (editValue: string, index: number) => {
     setIsEditing(true);
-    setTodoInputValue(editValue)
-    setEditAbleIndex(index)
+    setTodoInputValue(editValue);
+    setEditAbleIndex(index);
   };
 
   const handleUpdateTodo = () => {
-    let updatedList = todoList;
-    updatedList[editAbleIndex] = todoInputValue;
-    setTodoList(updatedList)
-    setTodoInputValue("")
-    setIsEditing(false)
+    setTodoList((state) => {
+      state[editAbleIndex] = todoInputValue;
+      return state;
+    });
+    setTodoInputValue("");
+    setIsEditing(false);
   };
 
   return (
@@ -59,23 +62,26 @@ const Home: NextPage = () => {
           <TextField
             fullWidth
             size="small"
-            label="Todo"
             variant="outlined"
             value={todoInputValue}
+            label={isEditing ? "Edit Todo" : "Add Todo"}
             onChange={(e) => setTodoInputValue(e.target.value)}
           />
-          <Button variant="contained" onClick={isEditing ?  handleUpdateTodo : handleAddTodo}>
+          <Button
+            variant="contained"
+            onClick={isEditing ? handleUpdateTodo : handleAddTodo}
+          >
             {isEditing ? "edit" : "add"}
           </Button>
         </div>
 
         {/* showing list of todo */}
-        <List component="nav">
+        <List component="div">
           {todoList.map((todo, index) => (
             <div key={index}>
               <ListItem>
                 <ListItemText primary={todo} />
-                <IconButton onClick={() => handleDeleteTodo(todo)}>
+                <IconButton onClick={() => handleDeleteTodo(index)}>
                   <DeleteForeverIcon />
                 </IconButton>
                 <IconButton onClick={() => handleEditTodo(todo, index)}>
